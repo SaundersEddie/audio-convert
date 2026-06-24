@@ -27,17 +27,52 @@ FFmpeg website:
 https://ffmpeg.org/
 ```
 
-Install FFmpeg on macOS with Homebrew:
+### Install FFmpeg
+
+macOS with Homebrew:
 
 ```bash
 brew install ffmpeg
 ```
 
-Check FFmpeg is available:
+Windows with winget:
+
+```powershell
+winget install Gyan.FFmpeg
+```
+
+Windows with Chocolatey:
+
+```powershell
+choco install ffmpeg
+```
+
+Ubuntu / Debian Linux:
+
+```bash
+sudo apt update
+sudo apt install ffmpeg
+```
+
+Fedora Linux:
+
+```bash
+sudo dnf install ffmpeg
+```
+
+Arch Linux:
+
+```bash
+sudo pacman -S ffmpeg
+```
+
+Check FFmpeg is available after installing:
 
 ```bash
 ffmpeg -version
 ```
+
+If that command prints FFmpeg version information, the converter is ready to use.
 
 ## Files
 
