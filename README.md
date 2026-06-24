@@ -121,17 +121,17 @@ python audio_converter.py --folder sounds --recursive --dry-run
 
 ## Options
 
-| Option | Purpose |
-|---|---|
-| `--file` | Convert one file. |
-| `--folder` | Convert all matching files in a folder. |
-| `--output-dir` | Place converted files in a chosen folder. |
-| `--input-ext` | Input extension for folder mode. Default: `.ogg`. |
-| `--format` | Output format. Default: `mp3`. |
-| `--bitrate` | Audio bitrate. Default: `192k`. |
-| `--recursive` | Include subfolders in folder mode. |
-| `--overwrite` | Replace existing output files. |
-| `--dry-run` | Print conversion commands without running them. |
+| Option         | Purpose                                           |
+| -------------- | ------------------------------------------------- |
+| `--file`       | Convert one file.                                 |
+| `--folder`     | Convert all matching files in a folder.           |
+| `--output-dir` | Place converted files in a chosen folder.         |
+| `--input-ext`  | Input extension for folder mode. Default: `.ogg`. |
+| `--format`     | Output format. Default: `mp3`.                    |
+| `--bitrate`    | Audio bitrate. Default: `192k`.                   |
+| `--recursive`  | Include subfolders in folder mode.                |
+| `--overwrite`  | Replace existing output files.                    |
+| `--dry-run`    | Print conversion commands without running them.   |
 
 ## Recommended Mobile Defaults
 
@@ -154,4 +154,4 @@ Use your ears. A laser pew-pew does not need audiophile treatment.
 - MP3 is broadly compatible across mobile platforms.
 - Keep original `.ogg` files as source assets.
 - Export converted files into a separate folder when possible.
-- If you later want AAC/M4A support, the script can be extended, but MP3 is the clean first pass.
+- If you later want AAC/M4A support, the script can be extended.
