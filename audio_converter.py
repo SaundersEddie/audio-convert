@@ -21,6 +21,16 @@ DEFAULT_INPUT_EXT = ".ogg"
 DEFAULT_OUTPUT_FORMAT = "mp3"
 DEFAULT_BITRATE = "192k"
 
+LOSSY_FORMATS = {"mp3", "ogg", "m4a", "aac"}
+
+OUTPUT_CODECS = {
+    "mp3": "libmp3lame",
+    "wav": "pcm_s16le",
+    "ogg": "libvorbis",
+    "m4a": "aac",
+    "aac": "aac",
+    "flac": "flac",
+}
 
 def require_ffmpeg() -> None:
     """Exit early if FFmpeg is not installed or not on PATH."""
@@ -39,6 +49,11 @@ def normalize_ext(value: str) -> str:
     if not value:
         raise ValueError("File extension / format cannot be empty.")
     return value if value.startswith(".") else f".{value}"
+
+
+def normalize_format(value: str) -> str:
+    """Normalize an output format string without the leading dot."""
+    return normalize_ext(value).lstrip(".")
 
 
 def build_output_path(
@@ -63,6 +78,7 @@ def build_output_path(
 def convert_file(
     input_file: Path,
     output_file: Path,
+    output_format: str,
     bitrate: str,
     overwrite: bool,
     dry_run: bool,
@@ -74,6 +90,17 @@ def convert_file(
 
     if output_file.exists() and not overwrite:
         print(f"Skipping existing file: {output_file}")
+        return False
+
+    output_format = normalize_format(output_format)
+
+    if output_format not in OUTPUT_CODECS:
+        supported = ", ".join(sorted(OUTPUT_CODECS))
+        print(
+            f"Unsupported output format: {output_format}. "
+            f"Supported formats: {supported}",
+            file=sys.stderr,
+        )
         return False
 
     output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -88,11 +115,13 @@ def convert_file(
         str(input_file),
         "-vn",
         "-codec:a",
-        "libmp3lame",
-        "-b:a",
-        bitrate,
-        str(output_file),
+        OUTPUT_CODECS[output_format],
     ]
+
+    if output_format in LOSSY_FORMATS:
+        command.extend(["-b:a", bitrate])
+
+    command.append(str(output_file))
 
     if dry_run:
         print("DRY RUN:", " ".join(command))
@@ -146,7 +175,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--format",
         default=DEFAULT_OUTPUT_FORMAT,
-        help="Output format/extension. Default: mp3",
+        help="Output format/extension. Supported: mp3, wav, ogg, m4a, aac, flac. Default: mp3",
     )
     parser.add_argument(
         "--bitrate",
@@ -182,7 +211,14 @@ def main() -> int:
     if args.file:
         input_file = args.file.resolve()
         output_file = build_output_path(input_file, args.output_dir, args.format)
-        ok = convert_file(input_file, output_file, args.bitrate, args.overwrite, args.dry_run)
+        ok = convert_file(
+            input_file=input_file,
+            output_file=output_file,
+            output_format=args.format,
+            bitrate=args.bitrate,
+            overwrite=args.overwrite,
+            dry_run=args.dry_run,
+        )
         converted += int(ok)
         failed += int(not ok)
 
@@ -206,7 +242,14 @@ def main() -> int:
                 output_format=args.format,
                 preserve_structure_root=input_dir if args.output_dir and args.recursive else None,
             )
-            ok = convert_file(input_file, output_file, args.bitrate, args.overwrite, args.dry_run)
+            ok = convert_file(
+                input_file=input_file,
+                output_file=output_file,
+                output_format=args.format,
+                bitrate=args.bitrate,
+                overwrite=args.overwrite,
+                dry_run=args.dry_run,
+            )
             converted += int(ok)
             failed += int(not ok)
 
