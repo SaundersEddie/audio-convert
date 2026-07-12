@@ -2,39 +2,59 @@
 
 A small Python command-line utility for converting audio files for mobile and game development.
 
-Primary use case: converting `.ogg` files to `.mp3` for mobile-friendly audio pipelines.
+It started as a quick `.ogg` to `.mp3` converter, but now supports three practical conversion modes:
 
-The tool can also export to:
+1. Convert one explicit file.
+2. Convert all supported audio files in a folder.
+3. Convert only files with selected extensions.
 
-- `.mp3`
-- `.wav`
-- `.ogg`
-- `.m4a`
-- `.aac`
-- `.flac`
+FFmpeg does the actual audio conversion. Python handles the workflow, folder scanning, output paths, and useful status reporting.
 
-This is intentionally a small utility, not a full digital audio workstation, editor, tag manager, or batch mastering tool. Tiny hammer, specific nail.
+## Default Behavior
+
+If you run the script with no options, it uses this default workflow:
+
+```bash
+python audio_converter.py
+```
+
+That means:
+
+```text
+./sounds/*.ogg -> ./converted/converted_YYYY-MM-DD_HH-MM-SS/*.mp3
+```
+
+Example:
+
+```text
+sounds/jump.ogg
+sounds/menu_click.ogg
+```
+
+becomes:
+
+```text
+converted/converted_2026-07-12_10-45-30/jump.mp3
+converted/converted_2026-07-12_10-45-30/menu_click.mp3
+```
+
+This gives you a safe default for mobile/game audio work: source files stay untouched, converted files go into a timestamped output folder.
 
 ## Scope
 
-This project is intentionally simple:
+This project is intentionally focused:
 
 - Convert a single audio file.
-- Convert every matching file in a folder.
+- Convert audio files in a folder.
+- Convert all supported audio formats in a folder.
+- Convert only selected input extensions.
 - Optionally search folders recursively.
-- Default conversion is `.ogg` to `.mp3`.
-- Supports common output formats useful for games and mobile workflows.
-- Uses FFmpeg for reliable audio conversion.
+- Optionally save converted files into a chosen output folder.
+- Create timestamped conversion folders when using an output folder.
+- Skip files that are already in the requested output format.
+- Show a clear summary of converted, skipped, and failed files.
 
-Out of scope for now:
-
-- GUI app
-- Metadata/tag editing
-- Audio trimming
-- Normalization/mastering
-- Cloud upload
-- Asset library management
-- Auto-import into game engines
+This is not intended to be a full digital audio workstation, editor, tag manager, or batch mastering tool. Tiny hammer, specific nail.
 
 ## Requirements
 
@@ -46,6 +66,8 @@ FFmpeg website:
 ```text
 https://ffmpeg.org/
 ```
+
+No Python packages are required.
 
 ## Install FFmpeg
 
@@ -101,143 +123,305 @@ audio_converter.py
 README.md
 ```
 
-## Basic Usage
+## Conversion Modes
 
-Convert one `.ogg` file to `.mp3` in the same folder:
+### 1. Convert one explicit file
 
-```bash
-python audio_converter.py --file sounds/jump.ogg
-```
-
-Convert one file into a specific output folder:
+Convert a single named file to the default output format, `.mp3`:
 
 ```bash
-python audio_converter.py --file sounds/jump.ogg --output-dir converted
+python audio_converter.py --file sounds/eddieSound.ogg
 ```
 
-Convert all `.ogg` files in a folder:
+Result:
+
+```text
+sounds/eddieSound.ogg -> sounds/eddieSound.mp3
+```
+
+Convert one file to a specific output format:
 
 ```bash
-python audio_converter.py --folder sounds
+python audio_converter.py --file sounds/eddieSound.ogg --format flac
 ```
 
-Convert all `.ogg` files in a folder and its subfolders:
+Result:
+
+```text
+sounds/eddieSound.ogg -> sounds/eddieSound.flac
+```
+
+Save the converted file into a timestamped output folder:
 
 ```bash
-python audio_converter.py --folder sounds --recursive --output-dir converted
+python audio_converter.py --file sounds/eddieSound.ogg --format mp3 --output-dir converted
 ```
 
-Overwrite existing converted files:
+Result:
+
+```text
+converted/converted_YYYY-MM-DD_HH-MM-SS/eddieSound.mp3
+```
+
+### 2. Convert an entire folder of supported audio
+
+Convert every supported audio file in a folder to `.mp3`:
 
 ```bash
-python audio_converter.py --folder sounds --overwrite
+python audio_converter.py --folder sounds --all-audio --format mp3
 ```
 
-Preview what would happen without converting anything:
+Example input:
+
+```text
+sounds/jump.ogg
+sounds/hit.wav
+sounds/theme.flac
+sounds/menu.mp3
+sounds/notes.txt
+```
+
+Result:
+
+```text
+sounds/jump.mp3       created
+sounds/hit.mp3        created
+sounds/theme.mp3      created
+sounds/menu.mp3       skipped, already .mp3
+sounds/notes.txt      skipped, unsupported file type
+```
+
+Save the results to a timestamped output folder:
 
 ```bash
-python audio_converter.py --folder sounds --recursive --dry-run
+python audio_converter.py --folder sounds --all-audio --format mp3 --output-dir converted
 ```
+
+Result:
+
+```text
+converted/converted_YYYY-MM-DD_HH-MM-SS/jump.mp3
+converted/converted_YYYY-MM-DD_HH-MM-SS/hit.mp3
+converted/converted_YYYY-MM-DD_HH-MM-SS/theme.mp3
+```
+
+### 3. Convert only specific extensions
+
+Convert only `.wav` files in a folder to `.aac`:
+
+```bash
+python audio_converter.py --folder sounds --input-formats wav --format aac
+```
+
+Example input:
+
+```text
+sounds/jump.wav
+sounds/hit.wav
+sounds/music.ogg
+sounds/theme.mp3
+```
+
+Result:
+
+```text
+sounds/jump.aac       created
+sounds/hit.aac        created
+sounds/music.ogg      skipped, not part of selected input filter
+sounds/theme.mp3      skipped, not part of selected input filter
+```
+
+Convert multiple selected input formats:
+
+```bash
+python audio_converter.py --folder sounds --input-formats ogg wav flac --format mp3
+```
+
+## Recursive Folder Conversion
+
+Use `--recursive` to include subfolders:
+
+```bash
+python audio_converter.py --folder sounds --all-audio --format mp3 --recursive --output-dir converted
+```
+
+Example input:
+
+```text
+sounds/sfx/jump.ogg
+sounds/sfx/hit.wav
+sounds/music/theme.flac
+```
+
+Result:
+
+```text
+converted/converted_YYYY-MM-DD_HH-MM-SS/sfx/jump.mp3
+converted/converted_YYYY-MM-DD_HH-MM-SS/sfx/hit.mp3
+converted/converted_YYYY-MM-DD_HH-MM-SS/music/theme.mp3
+```
+
+The folder structure is preserved when using `--recursive` with `--output-dir`.
+
+## Timestamped Output Folders
+
+When `--output-dir` is used, the converter creates a timestamped folder inside it by default:
+
+```bash
+python audio_converter.py --folder sounds --all-audio --output-dir converted
+```
+
+Example output folder:
+
+```text
+converted/converted_2026-07-12_10-45-30/
+```
+
+This makes conversion runs easy to separate and avoids accidentally mixing old and new files.
+
+To write directly into the output folder without creating a timestamped subfolder, use:
+
+```bash
+python audio_converter.py --folder sounds --all-audio --output-dir converted --no-run-folder
+```
+
+## Dry Run
+
+Preview what would happen without creating files:
+
+```bash
+python audio_converter.py --folder sounds --all-audio --format mp3 --output-dir converted --dry-run
+```
+
+This prints the FFmpeg commands that would run.
+
+## Overwriting Existing Files
+
+By default, existing converted files are skipped.
+
+Use `--overwrite` to replace them:
+
+```bash
+python audio_converter.py --folder sounds --input-formats ogg --format mp3 --overwrite
+```
+
+## Supported Input Formats
+
+The `--all-audio` option currently recognizes these input formats:
+
+```text
+aac, aif, aiff, flac, m4a, mp3, oga, ogg, opus, wav, wma
+```
+
+FFmpeg may support more formats, but this list keeps the tool predictable for game/audio asset workflows.
 
 ## Output Formats
 
-Supported output formats:
-
-| Format | Codec | Best For |
-| ------ | ----- | -------- |
-| `mp3` | `libmp3lame` | Mobile-friendly compressed audio, general compatibility |
-| `wav` | `pcm_s16le` | Editing, Unity-friendly source/intermediate files |
-| `ogg` | `libvorbis` | Desktop/web/game-engine audio workflows |
-| `m4a` | `aac` | Mobile-friendly compressed audio, especially Apple-heavy workflows |
-| `aac` | `aac` | Raw AAC output when specifically needed |
-| `flac` | `flac` | Lossless archive/intermediate files |
-
-The default output format is:
+Common output formats:
 
 ```text
-mp3
+mp3, aac, m4a, ogg, opus, flac, wav
+```
+
+Examples:
+
+```bash
+python audio_converter.py --folder sounds --all-audio --format mp3
+python audio_converter.py --folder sounds --all-audio --format flac
+python audio_converter.py --folder sounds --input-formats wav --format aac
+python audio_converter.py --file sounds/theme.flac --format m4a
+```
+
+## Status Output
+
+The converter reports what happened to each file:
+
+```text
+[CONVERT]   sounds/jump.ogg -> converted/converted_YYYY-MM-DD_HH-MM-SS/jump.mp3
+[SKIPPED]   sounds/theme.mp3 - already .mp3
+[SKIPPED]   sounds/notes.txt - Unsupported file type.
+[SKIPPED]   sounds/hit.wav - output already exists: sounds/hit.mp3
+[FAILED]    sounds/broken.ogg
+```
+
+At the end, it prints a summary:
+
+```text
+Audio conversion complete.
+Converted: 12
+Would convert: 0
+Already target format: 4
+Unsupported files skipped: 2
+Existing outputs skipped: 1
+Missing files: 0
+Failed: 0
 ```
 
 ## Options
 
 | Option | Purpose |
-| ------ | ------- |
-| `--file` | Convert one file. |
-| `--folder` | Convert all matching files in a folder. |
-| `--output-dir` | Place converted files in a chosen folder. |
-| `--input-ext` | Input extension for folder mode. Default: `.ogg`. |
-| `--format` | Output format. Supported: `mp3`, `wav`, `ogg`, `m4a`, `aac`, `flac`. Default: `mp3`. |
-| `--bitrate` | Audio bitrate for lossy formats. Default: `192k`. |
+|---|---|
+| `--file` | Convert one explicit file. |
+| `--folder` | Convert files in a folder. |
+| `--all-audio` | Convert every supported audio file in folder mode. |
+| `--input-formats` | Convert only selected extensions in folder mode. Example: `--input-formats ogg wav flac`. |
+| `--format` | Output format. Default: `mp3`. |
+| `--bitrate` | Audio bitrate for compressed formats. Default: `192k`. |
+| `--output-dir` | Place converted files in a chosen folder. Creates a timestamped run folder by default. |
+| `--no-run-folder` | Do not create a timestamped folder inside `--output-dir`. |
 | `--recursive` | Include subfolders in folder mode. |
 | `--overwrite` | Replace existing output files. |
 | `--dry-run` | Print conversion commands without running them. |
 
-## Recommended Mobile Defaults
+## Practical Examples
 
-For most mobile game sound effects and short music clips:
-
-```bash
-python audio_converter.py --folder audio_raw --recursive --output-dir audio_mobile --format mp3 --bitrate 192k
-```
-
-For smaller files, try:
+Default mobile/game audio conversion:
 
 ```bash
-python audio_converter.py --folder audio_raw --recursive --output-dir audio_mobile --format mp3 --bitrate 128k
+python audio_converter.py
 ```
 
-Use your ears. A laser pew-pew does not need audiophile treatment.
-
-## Example Format Conversions
-
-Convert `.ogg` files to `.mp3`:
+Convert all `.ogg` files in `sounds` to `.mp3` beside the originals:
 
 ```bash
-python audio_converter.py --folder audio_raw --recursive --output-dir audio_mp3 --format mp3
+python audio_converter.py --folder sounds --input-formats ogg --format mp3
 ```
 
-Convert `.ogg` files to `.wav`:
+Convert every supported audio file in `sounds` to `.mp3`:
 
 ```bash
-python audio_converter.py --folder audio_raw --recursive --output-dir audio_wav --format wav
+python audio_converter.py --folder sounds --all-audio --format mp3
 ```
 
-Convert `.ogg` files to `.m4a`:
+Convert every supported audio file recursively and save to a dated output folder:
 
 ```bash
-python audio_converter.py --folder audio_raw --recursive --output-dir audio_m4a --format m4a
+python audio_converter.py --folder sounds --all-audio --recursive --output-dir converted --format mp3
 ```
 
-Convert `.ogg` files to `.flac`:
+Convert only `.wav` files to `.aac`:
 
 ```bash
-python audio_converter.py --folder audio_raw --recursive --output-dir audio_flac --format flac
+python audio_converter.py --folder sounds --input-formats wav --format aac
 ```
 
-Convert `.wav` files to `.mp3`:
+Convert `.ogg`, `.wav`, and `.flac` files to `.m4a`:
 
 ```bash
-python audio_converter.py --folder audio_raw --input-ext wav --recursive --output-dir audio_mp3 --format mp3
+python audio_converter.py --folder sounds --input-formats ogg wav flac --format m4a
 ```
 
-## Notes
+Preview a conversion run:
 
-- MP3 is broadly compatible across mobile platforms.
-- WAV is useful for editing and clean source/intermediate assets.
-- OGG is useful in many game and web workflows, but may not be ideal for every mobile target.
-- M4A/AAC can be useful for mobile-focused workflows.
-- FLAC is useful when you want lossless compression.
-- Keep original audio files as source assets.
-- Export converted files into a separate folder when possible.
-- Use `--dry-run` before large batch conversions.
-- Use `--overwrite` only when you are sure you want to replace existing files.
-
-## Current Status
-
-Current working milestone:
-
-```text
-Single file conversion -> folder conversion -> recursive batch conversion -> safe overwrite handling -> dry run support -> common output formats
+```bash
+python audio_converter.py --folder sounds --all-audio --format mp3 --output-dir converted --dry-run
 ```
 
-This tool is considered useful as a local CLI helper for game/audio asset prep.
+## Notes for Mobile/Game Development
+
+- `.mp3` is broadly compatible and a safe first target for many mobile workflows.
+- `.aac` / `.m4a` can be useful for mobile audio too, especially for music or longer clips.
+- Keep your original source audio files.
+- Use `--output-dir converted` when you want clean export batches.
+- Use `--recursive` when your game audio is organized into folders like `sfx`, `music`, and `ui`.
+- Use `--dry-run` before big conversions. Trust, but verify. Very sensible.
