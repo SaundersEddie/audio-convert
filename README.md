@@ -1,6 +1,15 @@
 # Audio Converter
 
-A small Python command-line utility for converting audio files for mobile and game development.
+A small Python command-line utility by Eddie Saunders for converting audio files for mobile and game development.
+
+This tool is part of the practical tooling around **One Grid at a Time (OGaaT)**: small, useful development tools built to support real game-development workflows without turning every helper script into a giant framework.
+
+Links:
+
+- Main site: https://eddiesaunders.com/
+- Code / QA tools: https://eddiesaunders.com/code
+- YouTube: https://www.youtube.com/@onegridatatime  
+
 
 It started as a quick `.ogg` to `.mp3` converter, but now supports three practical conversion modes:
 
@@ -54,7 +63,7 @@ This project is intentionally focused:
 - Skip files that are already in the requested output format.
 - Show a clear summary of converted, skipped, and failed files.
 
-This is not intended to be a full digital audio workstation, editor, tag manager, or batch mastering tool. Tiny hammer, specific nail.
+This is not intended to be a full digital audio workstation, editor, tag manager, or batch mastering tool. It is a focused conversion utility for practical game/audio asset workflows.
 
 ## Requirements
 
@@ -417,6 +426,22 @@ Preview a conversion run:
 python audio_converter.py --folder sounds --all-audio --format mp3 --output-dir converted --dry-run
 ```
 
+## Freeware and Optional Support
+
+This software is freeware. You can use it for personal projects, game-development experiments, learning, content creation, and internal tooling.
+
+If you like the tool, use it in your own workflow, and want to support more small utilities, OGaaT content, and Eddie Saunders projects, you can optionally buy me a coffee here:
+
+https://paypal.me/edwynsaunders1
+
+Support is completely optional. The tool remains free to use.
+
+## Project Links
+
+- Main site: https://eddiesaunders.com/
+- Code / QA tools: https://eddiesaunders.com/code
+- YouTube: https://www.youtube.com/@onegridatatime  
+
 ## Notes for Mobile/Game Development
 
 - `.mp3` is broadly compatible and a safe first target for many mobile workflows.
@@ -424,4 +449,4 @@ python audio_converter.py --folder sounds --all-audio --format mp3 --output-dir 
 - Keep your original source audio files.
 - Use `--output-dir converted` when you want clean export batches.
 - Use `--recursive` when your game audio is organized into folders like `sfx`, `music`, and `ui`.
-- Use `--dry-run` before big conversions. Trust, but verify. Very sensible.
+- Use `--dry-run` before big conversions so you can confirm exactly what will happen before files are created.
