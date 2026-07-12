@@ -7,7 +7,7 @@ This tool is part of the practical tooling around **One Grid at a Time (OGaaT)**
 Links:
 
 - Main site: https://eddiesaunders.com/
-- Code / QA tools: https://eddiesaunders.com/code
+- Code / tools: https://eddiesaunders.com/code
 - YouTube: https://www.youtube.com/@onegridatatime  
 
 
@@ -439,7 +439,7 @@ Support is completely optional. The tool remains free to use.
 ## Project Links
 
 - Main site: https://eddiesaunders.com/
-- Code / QA tools: https://eddiesaunders.com/code
+- Code / tools: https://eddiesaunders.com/code
 - YouTube: https://www.youtube.com/@onegridatatime  
 
 ## Notes for Mobile/Game Development
