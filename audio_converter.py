@@ -264,20 +264,51 @@ def find_folder_files(
     results: list[Result] = []
 
     for path in sorted(item for item in iterator if item.is_file()):
+        if not path.suffix:
+            results.append(
+                Result(
+                    Status.UNSUPPORTED,
+                    path,
+                    message="File has no extension.",
+                )
+            )
+            continue
+
         source_format = normalize_format(path.suffix)
 
         if all_audio:
             if source_format in SUPPORTED_AUDIO_FORMATS:
                 results.append(Result(Status.WOULD_CONVERT, path))
             else:
-                results.append(Result(Status.UNSUPPORTED, path, message="Unsupported file type."))
+                results.append(
+                    Result(
+                        Status.UNSUPPORTED,
+                        path,
+                        message="Unsupported file type.",
+                    )
+                )
         else:
             if source_format in input_formats:
                 results.append(Result(Status.WOULD_CONVERT, path))
             elif source_format in SUPPORTED_AUDIO_FORMATS:
-                results.append(Result(Status.UNSUPPORTED, path, message="Audio file does not match selected input format filter."))
+                results.append(
+                    Result(
+                        Status.UNSUPPORTED,
+                        path,
+                        message=(
+                            "Audio file does not match selected "
+                            "input format filter."
+                        ),
+                    )
+                )
             else:
-                results.append(Result(Status.UNSUPPORTED, path, message="Unsupported file type."))
+                results.append(
+                    Result(
+                        Status.UNSUPPORTED,
+                        path,
+                        message="Unsupported file type.",
+                    )
+                )
 
     return results
 
