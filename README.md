@@ -11,6 +11,10 @@ Links:
 - YouTube: https://www.youtube.com/@onegridatatime  
 
 
+If you like the tool, use it in your own workflow, and want to support more small utilities, OGaaT content, and Eddie Saunders projects, you can optionally buy me a coffee here:
+
+https://paypal.me/edwynsaunders1  
+
 It started as a quick `.ogg` to `.mp3` converter, but now supports three practical conversion modes:
 
 1. Convert one explicit file.
