@@ -454,3 +454,12 @@ Support is completely optional. The tool remains free to use.
 - Use `--output-dir converted` when you want clean export batches.
 - Use `--recursive` when your game audio is organized into folders like `sfx`, `music`, and `ui`.
 - Use `--dry-run` before big conversions so you can confirm exactly what will happen before files are created.
+
+
+## Disclaimer
+
+This tool is provided as-is, with no guarantees that it will behave perfectly with every file, codec, operating system, or strange audio format dragged in from the darker corners of the internet.
+
+Keep a copy of your original files before converting anything important.
+
+If it works, excellent. If it does not, open an issue with the error details and I’ll take a look when I can.
